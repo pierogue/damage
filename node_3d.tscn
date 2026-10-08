@@ -1,0 +1,237 @@
+[gd_scene format=3 uid="uid://cux0sbualtns2"]
+
+[ext_resource type="Script" uid="uid://ck462digiqk8r" path="res://CharacterControls.cs" id="1_a202f"]
+[ext_resource type="Script" uid="uid://c3pcjk32epoa6" path="res://SwordControls.cs" id="2_noarx"]
+[ext_resource type="Script" uid="uid://bij1c4ym7od8f" path="res://EnemyBehavior.cs" id="3_a0tk4"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_j0uls"]
+size = Vector3(0.5057373, 1, 0.5107422)
+
+[sub_resource type="BoxMesh" id="BoxMesh_j0uls"]
+size = Vector3(0.44430542, 1, 0.5032959)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4xowi"]
+albedo_color = Color(0.48235294, 0.6156863, 0.59607846, 1)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_r3fl7"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_yokso"]
+height = 1.9335938
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a202f"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_noarx"]
+height = 1.1829834
+radius = 0.0859375
+
+[sub_resource type="Animation" id="Animation_noarx"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterBody3D/SwordRoot/AnimatableBody3D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-0.35189918, 0.26420593, 0.5915591)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CharacterBody3D/SwordRoot/AnimatableBody3D:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, -1.5707964, -0.45727625)]
+}
+
+[sub_resource type="Animation" id="Animation_a202f"]
+resource_name = "sword_slash_1"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CharacterBody3D/SwordRoot/AnimatableBody3D:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 0.65, 0.8, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(-0.35189918, 0.26420593, 0.5915591), Vector3(-0.5269999, 0.264, 0.592), Vector3(0.5730001, 0.219, 0.592), Vector3(0.40299997, 0.219, 0.592), Vector3(-0.35189918, 0.26420593, 0.5915591)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CharacterBody3D/SwordRoot/AnimatableBody3D:rotation")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5, 0.65, 0.8, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, -1.5707964, -0.45727625), Vector3(1.16700065e-07, -3.1660268, -0.45727625), Vector3(0.87266463, -0.48694682, -0.45727625), Vector3(0.87266463, -0.48694682, -0.45727625), Vector3(0, -1.5707964, -0.45727625)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_a0tk4"]
+_data = {
+&"RESET": SubResource("Animation_noarx"),
+&"sword_slash_1": SubResource("Animation_a202f")
+}
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_j0uls"]
+radius = 9.920085
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yokso"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_yokso"]
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_j0uls"]
+vertices = PackedVector3Array(3.5, 0.5, -1.2499962, 5.25, 0.5, -1.2499962, 5.25, 0.5, -2.4999962, 6.25, 0.5, -2.7499962, 6.25, 0.5, -49.499996, 3.25, 0.5, -0.24999619, -49.5, 0.5, -49.499996, -49.5, 0.5, -0.24999619, 7.5, 0.5, -2.4999962, 7.5, 0.5, 3.8146973e-06, 49.5, 0.5, 3.8146973e-06, 49.5, 0.5, -49.499996, 5.25, 0.5, 2.5000038, 5.25, 0.5, 1.0000038, 3.25, 0.5, 0.7500038, 6.25, 0.5, 49.500004, 6.25, 0.5, 2.7500038, -49.5, 0.5, 49.500004, 7.5, 0.5, 2.5000038, 49.5, 0.5, 49.500004)
+polygons = [PackedInt32Array(2, 1, 0), PackedInt32Array(4, 3, 2), PackedInt32Array(0, 4, 2), PackedInt32Array(0, 5, 4), PackedInt32Array(4, 5, 7), PackedInt32Array(4, 7, 6), PackedInt32Array(10, 9, 8), PackedInt32Array(8, 3, 10), PackedInt32Array(10, 3, 4), PackedInt32Array(10, 4, 11), PackedInt32Array(14, 13, 12), PackedInt32Array(12, 16, 15), PackedInt32Array(12, 15, 14), PackedInt32Array(14, 15, 7), PackedInt32Array(7, 15, 17), PackedInt32Array(7, 5, 14), PackedInt32Array(18, 9, 10), PackedInt32Array(18, 10, 16), PackedInt32Array(16, 10, 15), PackedInt32Array(15, 10, 19)]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_a202f"]
+bounce = 0.2
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yokso"]
+size = Vector3(1.0290527, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_yokso"]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_a202f"]
+data = PackedVector3Array(50, 0, 50, -50, 0, 50, 50, 0, -50, -50, 0, 50, -50, 0, -50, 50, 0, -50)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q2qf5"]
+specular_mode = 1
+metallic = 0.85
+clearcoat_enabled = true
+clearcoat = 0.15
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_d4jjt"]
+material = SubResource("StandardMaterial3D_q2qf5")
+size = Vector2(100, 100)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_noarx"]
+data = PackedVector3Array(50, 0, 50, -50, 0, 50, 50, 0, -50, -50, 0, 50, -50, 0, -50, 50, 0, -50)
+
+[node name="Node3D" type="Node3D" unique_id=1790007626]
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=309538135 groups=["player"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25388646, 0)
+collision_layer = 3
+collision_mask = 3
+script = ExtResource("1_a202f")
+
+[node name="CharaterCollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=502297955]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.016662598, 0.5892577, 0.0073242188)
+shape = SubResource("BoxShape3D_j0uls")
+
+[node name="CharacterMesh3D" type="MeshInstance3D" parent="CharacterBody3D/CharaterCollisionShape3D" unique_id=1423715293]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_j0uls")
+surface_material_override/0 = SubResource("StandardMaterial3D_4xowi")
+
+[node name="Camera3D" type="Camera3D" parent="CharacterBody3D/CharaterCollisionShape3D/CharacterMesh3D" unique_id=382842437]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -0.272, 0.272, 0)
+current = true
+
+[node name="SwordRoot" type="Node3D" parent="CharacterBody3D" unique_id=1498034725]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="AnimatableBody3D" type="AnimatableBody3D" parent="CharacterBody3D/SwordRoot" unique_id=1762031455 node_paths=PackedStringArray("AnimationPlayer")]
+transform = Transform3D(-3.9220406e-08, -1.9298833e-08, -1, -0.44150582, 0.8972584, 0, 0.89725834, 0.44150585, -4.371139e-08, -0.35189918, 0.26420593, 0.5915591)
+collision_layer = 3
+collision_mask = 3
+physics_material_override = SubResource("PhysicsMaterial_r3fl7")
+sync_to_physics = false
+script = ExtResource("2_noarx")
+AnimationPlayer = NodePath("../../../AnimationPlayer")
+
+[node name="SwordMesh2" type="MeshInstance3D" parent="CharacterBody3D/SwordRoot/AnimatableBody3D" unique_id=641576497]
+transform = Transform3D(0.158858, 5.9604645e-08, 3.1086245e-15, 7.450581e-09, 0.6076562, 0, 0, -4.440892e-15, 0.15885796, 2.0861626e-07, 0.53423166, 1.1920929e-07)
+mesh = SubResource("CylinderMesh_yokso")
+surface_material_override/0 = SubResource("StandardMaterial3D_a202f")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D/SwordRoot/AnimatableBody3D" unique_id=1563243895]
+transform = Transform3D(1, 2.9802322e-08, -1.0658141e-14, -2.9802322e-08, 1, 3.5527137e-15, 1.0658141e-14, -3.5527137e-15, 1, 2.9802322e-07, 0.53037655, 8.940697e-08)
+shape = SubResource("CylinderShape3D_noarx")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=11439699]
+transform = Transform3D(0.27549118, 0.73148507, -0.62372607, 0, 0.6488336, 0.76093036, 0.9613036, -0.2096296, 0.17874792, 0, 8.027889, 12.904878)
+shadow_enabled = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1669272587]
+libraries/ = SubResource("AnimationLibrary_a0tk4")
+
+[node name="EnemyBody3D" type="CharacterBody3D" parent="." unique_id=794188102 groups=["player"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.835972, 4.7683716e-07, 0.23099232)
+collision_layer = 3
+script = ExtResource("3_a0tk4")
+
+[node name="EnemyArea" type="Area3D" parent="EnemyBody3D" unique_id=1118960225]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EnemyBody3D/EnemyArea" unique_id=1364679984]
+shape = SubResource("SphereShape3D_j0uls")
+debug_color = Color(0.95686275, 0, 0, 0.41960785)
+
+[node name="EnemyCollisionShape3D" type="CollisionShape3D" parent="EnemyBody3D" unique_id=205019482]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_yokso")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="EnemyBody3D" unique_id=1452631307]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CapsuleMesh_yokso")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="EnemyBody3D" unique_id=735846832]
+
+[node name="RayCast3D" type="RayCast3D" parent="EnemyBody3D" unique_id=283563289]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+collision_mask = 2
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=283912523]
+navigation_mesh = SubResource("NavigationMesh_j0uls")
+
+[node name="Wall" type="RigidBody3D" parent="NavigationRegion3D" unique_id=912106736]
+transform = Transform3D(1, 0, 0, 0, 3.1903455, 0, 0, 0, 4.1740804, 6.3971047, 1.742142, 0.08033061)
+mass = 1000.0
+physics_material_override = SubResource("PhysicsMaterial_a202f")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Wall" unique_id=916121183]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.014526367, 0, 0)
+shape = SubResource("BoxShape3D_yokso")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/Wall/CollisionShape3D" unique_id=973520737]
+mesh = SubResource("BoxMesh_yokso")
+
+[node name="RigidBody3D" type="RigidBody3D" parent="NavigationRegion3D" unique_id=1792819592]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.332691, 1.2112772, 0)
+physics_material_override = SubResource("PhysicsMaterial_a202f")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/RigidBody3D" unique_id=1495827646]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.014526367, 0, 0)
+shape = SubResource("BoxShape3D_yokso")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/RigidBody3D/CollisionShape3D" unique_id=1069398963]
+mesh = SubResource("BoxMesh_yokso")
+
+[node name="Area3D" type="Area3D" parent="NavigationRegion3D" unique_id=544407131]
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="NavigationRegion3D/Area3D" unique_id=1790625619]
+shape = SubResource("ConcavePolygonShape3D_a202f")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/Area3D/CollisionShape3D2" unique_id=1379762020]
+transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0)
+mesh = SubResource("PlaneMesh_d4jjt")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="NavigationRegion3D/Area3D/CollisionShape3D2/MeshInstance3D" unique_id=1411170448]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Area3D/CollisionShape3D2/MeshInstance3D/StaticBody3D" unique_id=96515643]
+shape = SubResource("ConcavePolygonShape3D_noarx")
+
+[connection signal="body_entered" from="EnemyBody3D/EnemyArea" to="EnemyBody3D" method="OnDetectionAreaBodyEntered"]
+[connection signal="body_exited" from="EnemyBody3D/EnemyArea" to="EnemyBody3D" method="OnDetectionAreaBodyExited"]
