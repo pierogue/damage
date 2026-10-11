@@ -32,6 +32,14 @@ size = Vector3(0.6, 0.6, 0.6)
 transform = Transform3D(0.98835915, 0, 0.15213841, 0, 1, 0, -0.15213841, 0, 0.98835915, 5, 0.1, 0)
 patrol_points = [NodePath("../P1"), NodePath("../P2"), NodePath("../P3"), NodePath("../P4"), NodePath("../P5")]
 
+[node name="Enemy2" parent="." unique_id=518159488 node_paths=PackedStringArray("patrol_points") instance=ExtResource("1_0xm2m")]
+transform = Transform3D(0.98835915, 0, 0.15213841, 0, 1, 0, -0.15213841, 0, 0.98835915, 5, 0.1, -1.7687042)
+patrol_points = [NodePath("../P1"), NodePath("../P2"), NodePath("../P3"), NodePath("../P4"), NodePath("../P5")]
+
+[node name="Enemy3" parent="." unique_id=1574710656 node_paths=PackedStringArray("patrol_points") instance=ExtResource("1_0xm2m")]
+transform = Transform3D(0.98835915, 0, 0.15213841, 0, 1, 0, -0.15213841, 0, 0.98835915, 5, 0.1, 3.4965498)
+patrol_points = [NodePath("../P1"), NodePath("../P2"), NodePath("../P3"), NodePath("../P4"), NodePath("../P5")]
+
 [node name="Player" parent="." unique_id=1758786537 instance=ExtResource("2_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6.89501)
 

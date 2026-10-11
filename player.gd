@@ -1,55 +1,78 @@
 class_name Player
 extends CharacterBody3D
 ## Игрок от первого лица: ходьба, бег, присед, прыжок, карабканье по стенам,
-## шум, бита и пистолет.
+## шум и три вида оружия: финка, пистолет, пистолет-пулемёт.
 ##
 ## Управление: WASD ходьба, Shift бег, C присед, Space прыжок,
-## Space + W у стены = карабкаться, ЛКМ атака, 1 бита, 2 пистолет,
-## R перезарядка, Esc освободить мышь.
+## Space + W у стены = карабкаться, ЛКМ атака (у ПП можно зажать),
+## 1-3 или колёсико мыши смена оружия, R перезарядка, Esc освободить мышь.
 ##
 ## Дерево сцены:
 ## Player (CharacterBody3D, этот скрипт)
 ## ├─ CollisionShape3D (CapsuleShape3D: radius 0.4, height 1.8)
-## ├─ AimPoint (Marker3D)           <- точка, в которую целятся враги
+## ├─ AimPoint (Marker3D)
 ## └─ Head (Node3D)
 ##    ├─ Camera3D
-##    │  ├─ Bat (узел модели биты)      <- опционально
-##    │  └─ Pistol (узел модели пистолета) <- опционально
-##    └─ HitArea (Area3D)           <- зона удара битой, BoxShape3D, смещена на -1.1 по Z
-##
-## Нет узла Bat = биты нет. Нет узла Pistol = пистолета нет.
+##    │  ├─ Knife    (модель финки)         <- любой из трёх узлов
+##    │  ├─ Pistol   (модель пистолета)        можно не добавлять,
+##    │  └─ SMG      (модель пистолета-пулемёта) тогда этого оружия просто нет
+##    └─ HitArea (Area3D)  <- зона удара ближнего боя, BoxShape3D, смещена на -1.1 по Z
 
-enum Weapon { BAT, PISTOL }
+# ------------------------------------------------------------------ ОРУЖИЕ
+# Здесь настраивается всё оружие. melee = ближний бой, иначе стрельба.
+#   node      имя узла модели под Camera3D
+#   cooldown  пауза между атаками (сек)
+#   damage    урон (здоровье врага по умолчанию 100)
+#   ближний бой: delay (момент попадания в замахе), reach (дальность в метрах),
+#                swing (угол замаха), lunge (выпад вперёд), push (сила толчка предметов),
+#                hit_noise (шум удара), kill_noise (шум убийства со спины)
+#   стрельба:    auto (зажатая кнопка), mag (обойма), reserve (запас патронов),
+#                reload (время перезарядки), noise (радиус слышимости выстрела),
+#                spread (разброс в градусах), recoil (отдача модели), kick (подброс камеры)
+const WEAPONS := {
+	"knife": {
+		"name": "Knife", "node": "Knife", "melee": true,
+		"cooldown": 0.4, "damage": 35.0, "delay": 0.08, "reach": 1.7,
+		"swing": 30.0, "lunge": 0.25, "push": 2.0,
+		"hit_noise": 5.0, "kill_noise": 1.0,
+	},
+	"pistol": {
+		"name": "Pistol", "node": "Pistol", "melee": false,
+		"cooldown": 0.35, "damage": 50.0, "auto": false,
+		"mag": 12, "reserve": 36, "reload": 1.5,
+		"noise": 35.0, "spread": 0.0, "recoil": 10.0, "kick": 1.2,
+	},
+	"smg": {
+		"name": "SMG", "node": "SMG", "melee": false,
+		"cooldown": 0.08, "damage": 20.0, "auto": true,
+		"mag": 30, "reserve": 90, "reload": 2.0,
+		"noise": 40.0, "spread": 2.5, "recoil": 4.0, "kick": 0.5,
+	},
+}
+const ORDER := ["knife", "pistol", "smg"]           # порядок клавиш 1-3
+const RANGE := 80.0                                 # дальность пули
 
+# ------------------------------------------------------------------ ДВИЖЕНИЕ
 const WALK_SPEED := 3.5
 const SPRINT_SPEED := 6.5
 const CROUCH_SPEED := 1.8
 const ACCEL := 60.0       # разгон на земле (больше = резче, 1000 = мгновенно)
-const DECEL := 80.0       # торможение на земле (больше = останавливается резче)
+const DECEL := 80.0       # торможение на земле
 const AIR_ACCEL := 10.0   # управление в воздухе
 const JUMP_VELOCITY := 5.0
 const CLIMB_SPEED := 2.5
 const STAND_HEIGHT := 1.8
 const CROUCH_HEIGHT := 1.1
 
-const PISTOL_RANGE := 80.0
-const PISTOL_NOISE := 35.0     # радиус, в котором слышно выстрел
-const MAG_SIZE := 12
-const START_RESERVE := 36
-const RELOAD_TIME := 1.5
-
 @export var mouse_sensitivity := 0.002
 @export var max_health := 100.0
 @export var max_climb_time := 4.0
-@export var pistol_damage := 50.0   # здоровье врага по умолчанию 100 = 2 выстрела
 
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/Camera3D
 @onready var collision: CollisionShape3D = $CollisionShape3D
 @onready var aim_point: Marker3D = $AimPoint
 @onready var hit_area: Area3D = $Head/HitArea
-@onready var bat: Node3D = get_node_or_null("Head/Camera3D/Bat")
-@onready var pistol: Node3D = get_node_or_null("Head/Camera3D/Pistol")
 
 ## Множитель дальности, с которой враги видят игрока (читают враги)
 var visibility_multiplier := 1.0
@@ -58,9 +81,13 @@ var climbing := false
 var mantling := false
 var health: float
 
-var current_weapon := Weapon.BAT
-var ammo_in_mag := 0
-var ammo_reserve := 0
+var current_weapon := "knife"
+var weapon_nodes := {}          # id -> узел модели (только те, что есть в сцене)
+var rest_pos := {}              # id -> исходная позиция модели
+var rest_rot := {}              # id -> исходный поворот модели
+var ammo_mag := {}              # id -> патронов в обойме
+var ammo_reserve := {}          # id -> патронов в запасе
+var weapon_tween: Tween
 var reloading := false
 var reload_id := 0              # чтобы отменять перезарядку при смене оружия
 
@@ -70,9 +97,6 @@ var climb_noise_timer := 0.0
 var climb_time_left := 0.0
 var was_on_floor := true
 var attack_cooldown := 0.0
-var bat_rest_rotation := Vector3.ZERO
-var pistol_rest_position := Vector3.ZERO
-var pistol_rest_rotation := Vector3.ZERO
 
 var hud_label: Label
 var muzzle_light: OmniLight3D
@@ -85,18 +109,26 @@ func _ready() -> void:
 	collision.shape = collision.shape.duplicate()
 	health = max_health
 	climb_time_left = max_climb_time
-	ammo_in_mag = MAG_SIZE
-	ammo_reserve = START_RESERVE
 
-	if bat:
-		bat_rest_rotation = bat.rotation_degrees
-	if pistol:
-		pistol_rest_position = pistol.position
-		pistol_rest_rotation = pistol.rotation_degrees
+	# находим модели оружия и запоминаем их исходное положение
+	for id in ORDER:
+		var data: Dictionary = WEAPONS[id]
+		var node := get_node_or_null("Head/Camera3D/" + String(data["node"])) as Node3D
+		if node:
+			weapon_nodes[id] = node
+			rest_pos[id] = node.position
+			rest_rot[id] = node.rotation_degrees
+			node.visible = false
+		if not data["melee"]:
+			ammo_mag[id] = data["mag"]
+			ammo_reserve[id] = data["reserve"]
 
 	_build_hud()
 	_build_muzzle_light()
-	_set_weapon(Weapon.BAT if bat else Weapon.PISTOL)
+	for id in ORDER:           # стартуем с первого доступного оружия
+		if weapon_nodes.has(id):
+			_set_weapon(id)
+			break
 	_update_hud()
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
@@ -109,18 +141,21 @@ func _unhandled_input(event: InputEvent) -> void:
 		head.rotation.x = clampf(head.rotation.x, deg_to_rad(-85.0), deg_to_rad(85.0))
 	elif event.is_action_pressed("ui_cancel"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	elif event.is_action_pressed("attack"):
-		if not captured:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-		elif attack_cooldown <= 0.0 and not mantling:
-			if current_weapon == Weapon.BAT:
-				_bat_attack()
-			else:
-				_shoot()
+	elif event.is_action_pressed("attack") and not captured:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		attack_cooldown = 0.2   # этот клик только захватывает мышь
+	elif event is InputEventMouseButton and event.pressed \
+			and event.button_index == MOUSE_BUTTON_WHEEL_UP:
+		_cycle_weapon(-1)
+	elif event is InputEventMouseButton and event.pressed \
+			and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+		_cycle_weapon(1)
 	elif event.is_action_pressed("weapon_1"):
-		_set_weapon(Weapon.BAT)
+		_set_weapon("knife")
 	elif event.is_action_pressed("weapon_2"):
-		_set_weapon(Weapon.PISTOL)
+		_set_weapon("pistol")
+	elif event.is_action_pressed("weapon_3"):
+		_set_weapon("smg")
 	elif event.is_action_pressed("reload"):
 		_reload()
 
@@ -130,6 +165,7 @@ func _physics_process(delta: float) -> void:
 	if mantling:
 		return  # во время вылезания на уступ двигает твин
 
+	_handle_attack()
 	_update_crouch(delta)
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 
@@ -290,140 +326,210 @@ func _footsteps(delta: float, moving: bool, sprinting: bool) -> void:
 		NoiseBus.emit(global_position, 5.0)
 
 
-# ---------------------------------------------------------------- оружие
+# ---------------------------------------------------------------- смена оружия
 
-func _set_weapon(w: Weapon) -> void:
-	if w == Weapon.BAT and bat == null:
-		return
-	if w == Weapon.PISTOL and pistol == null:
-		return
-	current_weapon = w
+func _set_weapon(id: String) -> void:
+	if not weapon_nodes.has(id):
+		return  # такого оружия нет в сцене
+	if weapon_tween:
+		weapon_tween.kill()
+	for other in weapon_nodes:
+		var node: Node3D = weapon_nodes[other]
+		node.visible = (other == id)
+		node.position = rest_pos[other]
+		node.rotation_degrees = rest_rot[other]
+	current_weapon = id
 	reload_id += 1          # отменяет идущую перезарядку
 	reloading = false
-	attack_cooldown = 0.3
-	if bat:
-		bat.visible = (w == Weapon.BAT)
-	if pistol:
-		pistol.visible = (w == Weapon.PISTOL)
+	attack_cooldown = 0.3   # время "доставания" оружия
 	_update_hud()
 
 
-# ---------------------------------------------------------------- бита
+## Колёсико мыши: следующее/предыдущее из доступных видов оружия.
+func _cycle_weapon(step: int) -> void:
+	var idx := ORDER.find(current_weapon)
+	for i in ORDER.size():
+		idx = posmod(idx + step, ORDER.size())
+		if weapon_nodes.has(ORDER[idx]):
+			_set_weapon(ORDER[idx])
+			return
 
-func _bat_attack() -> void:
-	attack_cooldown = 0.7
-	_play_swing()
-	await get_tree().create_timer(0.15).timeout  # момент "контакта" в замахе
 
-	var loudness := 2.0  # свист биты в воздухе
+# ---------------------------------------------------------------- атака
+
+func _handle_attack() -> void:
+	if attack_cooldown > 0.0 or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+		return
+	var data: Dictionary = WEAPONS[current_weapon]
+	var wants := false
+	if data.get("auto", false):
+		wants = Input.is_action_pressed("attack")       # зажатая кнопка (ПП)
+	else:
+		wants = Input.is_action_just_pressed("attack")  # один клик = одна атака
+	if not wants:
+		return
+	if data["melee"]:
+		_melee_attack(data)
+	else:
+		_fire(data)
+
+
+# ---- ближний бой (финка)
+
+func _melee_attack(data: Dictionary) -> void:
+	attack_cooldown = data["cooldown"]
+	_play_melee_anim(data)
+	await get_tree().create_timer(data["delay"]).timeout  # момент "контакта" в замахе
+
+	var hit_noise: float = data["hit_noise"]
+	var loudness := hit_noise * 0.2   # свист оружия в воздухе
 	for body in hit_area.get_overlapping_bodies():
 		if body == self:
 			continue
-		var l := 8.0  # удар по статике (стена, пол)
+		var l := hit_noise * 0.7      # удар по статике (стена, пол)
 		if body is Enemy:
-			l = (body as Enemy).receive_bat_hit(self)
+			var flat := Vector2(
+				body.global_position.x - global_position.x,
+				body.global_position.z - global_position.z)
+			if flat.length() > float(data["reach"]):
+				continue              # враг дальше, чем достаёт это оружие
+			l = (body as Enemy).receive_melee_hit(
+				self, data["damage"], hit_noise, data["kill_noise"])
 		elif body is RigidBody3D:
 			var rb := body as RigidBody3D
-			var push := -camera.global_transform.basis.z * 6.0 + Vector3.UP * 1.5
+			var push := -camera.global_transform.basis.z * float(data["push"]) + Vector3.UP * 1.5
 			rb.apply_central_impulse(push * rb.mass)
-			l = 12.0
+			l = hit_noise
 		elif body.has_method("hit"):
 			body.hit(self)  # совместимость с твоими старыми объектами
-			l = 10.0
+			l = hit_noise
 		loudness = maxf(loudness, l)
 
 	NoiseBus.emit(hit_area.global_position, loudness)
 
 
-func _play_swing() -> void:
-	if bat == null:
+func _play_melee_anim(data: Dictionary) -> void:
+	var node: Node3D = weapon_nodes.get(current_weapon)
+	if node == null:
 		return
-	var t := create_tween()
-	t.tween_property(bat, "rotation_degrees:x", bat_rest_rotation.x - 70.0, 0.12) \
-		.set_ease(Tween.EASE_OUT)
-	t.tween_property(bat, "rotation_degrees:x", bat_rest_rotation.x, 0.3)
+	var rp: Vector3 = rest_pos[current_weapon]
+	var rr: Vector3 = rest_rot[current_weapon]
+	if weapon_tween:
+		weapon_tween.kill()
+	weapon_tween = create_tween()
+	weapon_tween.tween_property(
+		node, "rotation_degrees:x", rr.x - float(data["swing"]), 0.1).set_ease(Tween.EASE_OUT)
+	weapon_tween.parallel().tween_property(
+		node, "position:z", rp.z - float(data["lunge"]), 0.1)
+	weapon_tween.tween_property(node, "rotation_degrees:x", rr.x, 0.25)
+	weapon_tween.parallel().tween_property(node, "position:z", rp.z, 0.25)
 
 
-# ---------------------------------------------------------------- пистолет
+# ---- стрельба (пистолет, ПП)
 
-func _shoot() -> void:
+func _fire(data: Dictionary) -> void:
 	if reloading:
 		return
-	if ammo_in_mag <= 0:
+	var id := current_weapon
+	if ammo_mag[id] <= 0:
 		attack_cooldown = 0.3
 		NoiseBus.emit(global_position, 3.0)  # сухой щелчок
-		if ammo_reserve > 0:
+		if ammo_reserve[id] > 0:
 			_reload()
 		return
 
-	ammo_in_mag -= 1
-	attack_cooldown = 0.35
-	_play_recoil()
+	ammo_mag[id] -= 1
+	attack_cooldown = data["cooldown"]
+	_play_recoil(data)
 	_flash()
+	head.rotation.x = clampf(
+		head.rotation.x + deg_to_rad(float(data["kick"])),
+		deg_to_rad(-85.0), deg_to_rad(85.0))
 
-	# пуля летит из центра камеры; маска: слой 1 (мир) + слой 3 (враги) = 1 | 4
+	# пуля летит из центра камеры, с разбросом (в приседе он вдвое меньше)
+	var cam_basis := camera.global_transform.basis
+	var dir := -cam_basis.z
+	var spread := deg_to_rad(float(data["spread"]))
+	if crouching:
+		spread *= 0.5
+	if spread > 0.0:
+		dir = dir.rotated(cam_basis.x, randf_range(-spread, spread))
+		dir = dir.rotated(cam_basis.y, randf_range(-spread, spread))
+
+	# маска: слой 1 (мир) + слой 3 (враги) = 1 | 4
 	var from := camera.global_position
-	var dir := -camera.global_transform.basis.z
 	var query := PhysicsRayQueryParameters3D.create(
-		from, from + dir * PISTOL_RANGE, 1 | 4, [get_rid()])
+		from, from + dir * RANGE, 1 | 4, [get_rid()])
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
 
 	if not hit.is_empty():
 		var col: Object = hit.collider
 		if col is Enemy:
-			(col as Enemy).receive_shot(self, pistol_damage)
+			(col as Enemy).receive_shot(self, data["damage"])
 		elif col is RigidBody3D:
 			var rb := col as RigidBody3D
-			rb.apply_impulse(dir * 4.0 * rb.mass, hit.position - rb.global_position)
+			rb.apply_impulse(dir * 3.0 * rb.mass, hit.position - rb.global_position)
 		else:
 			_spawn_bullet_mark(hit.position, hit.normal)
 
 	# выстрел очень громкий: его слышат враги далеко вокруг
-	NoiseBus.emit(global_position, PISTOL_NOISE)
+	NoiseBus.emit(global_position, data["noise"])
 	_update_hud()
 
 
 func _reload() -> void:
-	if current_weapon != Weapon.PISTOL or reloading:
+	var data: Dictionary = WEAPONS[current_weapon]
+	if data["melee"] or reloading:
 		return
-	if ammo_in_mag >= MAG_SIZE or ammo_reserve <= 0:
+	var id := current_weapon
+	if ammo_mag[id] >= int(data["mag"]) or ammo_reserve[id] <= 0:
 		return
 
 	reloading = true
 	reload_id += 1
 	var my_id := reload_id
 	NoiseBus.emit(global_position, 3.0)
-	_play_reload_anim()
+	_play_reload_anim(data)
 	_update_hud()
 
-	await get_tree().create_timer(RELOAD_TIME).timeout
+	await get_tree().create_timer(data["reload"]).timeout
 	if my_id != reload_id:
 		return  # отменено сменой оружия
 
-	var take := mini(MAG_SIZE - ammo_in_mag, ammo_reserve)
-	ammo_in_mag += take
-	ammo_reserve -= take
+	var take := mini(int(data["mag"]) - int(ammo_mag[id]), int(ammo_reserve[id]))
+	ammo_mag[id] += take
+	ammo_reserve[id] -= take
 	reloading = false
 	_update_hud()
 
 
-func _play_recoil() -> void:
-	if pistol == null:
+func _play_recoil(data: Dictionary) -> void:
+	var node: Node3D = weapon_nodes.get(current_weapon)
+	if node == null:
 		return
-	var t := create_tween()
-	t.tween_property(pistol, "position", pistol_rest_position + Vector3(0.0, 0.02, 0.1), 0.05)
-	t.parallel().tween_property(pistol, "rotation_degrees:x", pistol_rest_rotation.x + 10.0, 0.05)
-	t.tween_property(pistol, "position", pistol_rest_position, 0.15)
-	t.parallel().tween_property(pistol, "rotation_degrees:x", pistol_rest_rotation.x, 0.15)
+	var rp: Vector3 = rest_pos[current_weapon]
+	var rr: Vector3 = rest_rot[current_weapon]
+	if weapon_tween:
+		weapon_tween.kill()
+	weapon_tween = create_tween()
+	weapon_tween.tween_property(node, "position", rp + Vector3(0.0, 0.02, 0.1), 0.04)
+	weapon_tween.parallel().tween_property(
+		node, "rotation_degrees:x", rr.x + float(data["recoil"]), 0.04)
+	weapon_tween.tween_property(node, "position", rp, 0.1)
+	weapon_tween.parallel().tween_property(node, "rotation_degrees:x", rr.x, 0.1)
 
 
-func _play_reload_anim() -> void:
-	if pistol == null:
+func _play_reload_anim(data: Dictionary) -> void:
+	var node: Node3D = weapon_nodes.get(current_weapon)
+	if node == null:
 		return
-	var t := create_tween()
-	t.tween_property(pistol, "rotation_degrees:x", pistol_rest_rotation.x - 50.0, 0.25)
-	t.tween_interval(RELOAD_TIME - 0.55)
-	t.tween_property(pistol, "rotation_degrees:x", pistol_rest_rotation.x, 0.3)
+	var rr: Vector3 = rest_rot[current_weapon]
+	if weapon_tween:
+		weapon_tween.kill()
+	weapon_tween = create_tween()
+	weapon_tween.tween_property(node, "rotation_degrees:x", rr.x - 50.0, 0.25)
+	weapon_tween.tween_interval(maxf(float(data["reload"]) - 0.55, 0.0))
+	weapon_tween.tween_property(node, "rotation_degrees:x", rr.x, 0.3)
 
 
 func _flash() -> void:
@@ -446,7 +552,7 @@ func _spawn_bullet_mark(pos: Vector3, normal: Vector3) -> void:
 	mark.mesh = sphere
 	scene.add_child(mark)
 	mark.global_position = pos + normal * 0.01
-	await get_tree().create_timer(8.0).timeout
+	await get_tree().create_timer(5.0).timeout
 	if is_instance_valid(mark):
 		mark.queue_free()
 
@@ -463,7 +569,7 @@ func _build_muzzle_light() -> void:
 
 # ---------------------------------------------------------------- HUD
 
-## Прицел и текст со здоровьем и патронами создаются прямо в коде.
+## Прицел и текст со здоровьем, оружием и патронами создаются прямо в коде.
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
@@ -487,12 +593,27 @@ func _build_hud() -> void:
 func _update_hud() -> void:
 	if hud_label == null:
 		return
-	var weapon_text := "Bat"
-	if current_weapon == Weapon.PISTOL:
-		weapon_text = "Pistol  %d / %d" % [ammo_in_mag, ammo_reserve]
+	var text := "HP: %d" % int(health)
+
+	# список доступного оружия, текущее в скобках
+	var slots: PackedStringArray = []
+	for i in ORDER.size():
+		var id: String = ORDER[i]
+		if not weapon_nodes.has(id):
+			continue
+		var slot := "%d %s" % [i + 1, WEAPONS[id]["name"]]
+		if id == current_weapon:
+			slot = "[" + slot + "]"
+		slots.append(slot)
+	if not slots.is_empty():
+		text += "\n" + "   ".join(slots)
+
+	var data: Dictionary = WEAPONS[current_weapon]
+	if not data["melee"]:
+		text += "\nAmmo: %d / %d" % [ammo_mag[current_weapon], ammo_reserve[current_weapon]]
 		if reloading:
-			weapon_text += "  (reloading...)"
-	hud_label.text = "HP: %d\n%s" % [int(health), weapon_text]
+			text += "  (reloading...)"
+	hud_label.text = text
 
 
 # ---------------------------------------------------------------- здоровье
@@ -519,6 +640,7 @@ func _setup_input() -> void:
 		"reload": KEY_R,
 		"weapon_1": KEY_1,
 		"weapon_2": KEY_2,
+		"weapon_3": KEY_3,
 	}
 	for action in keys:
 		if InputMap.has_action(action):

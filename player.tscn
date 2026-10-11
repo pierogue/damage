@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://b10saayk1fde3" path="res://player.gd" id="1_4flbx"]
 [ext_resource type="PackedScene" uid="uid://ktgkx6xl2j0b" path="res://Untitled.glb" id="2_onrkg"]
+[ext_resource type="PackedScene" uid="uid://dt38qj2agnv3l" path="res://oryzhie.glb" id="3_hqtel"]
+[ext_resource type="PackedScene" uid="uid://b6yi82afqquk5" path="res://fiinka.glb" id="4_sweqy"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4kxuq"]
 radius = 0.4
@@ -27,8 +29,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
 [node name="Camera3D" type="Camera3D" parent="Head" unique_id=581254537]
 
-[node name="Bat" parent="Head/Camera3D" unique_id=149548892 instance=ExtResource("2_onrkg")]
+[node name="Pistol" parent="Head/Camera3D" unique_id=149548892 instance=ExtResource("2_onrkg")]
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.4, -0.3, -0.6)
+
+[node name="SMG" parent="Head/Camera3D" unique_id=431689921 instance=ExtResource("3_hqtel")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="Knife" parent="Head/Camera3D" unique_id=1830664080 instance=ExtResource("4_sweqy")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
 [node name="HitArea" type="Area3D" parent="Head" unique_id=2000273322]
 collision_layer = 0
