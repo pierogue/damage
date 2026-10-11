@@ -14,6 +14,8 @@ size = Vector3(0.6, 0.6, 0.6)
 [sub_resource type="BoxMesh" id="BoxMesh_4kxuq"]
 size = Vector3(0.6, 0.6, 0.6)
 
+[sub_resource type="Environment" id="Environment_yokso"]
+
 [node name="Main" type="Node3D" unique_id=1943544522]
 
 [node name="Enemy" parent="." unique_id=2089989446 node_paths=PackedStringArray("patrol_points") instance=ExtResource("1_0xm2m")]
@@ -70,3 +72,6 @@ shape = SubResource("BoxShape3D_4kxuq")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D" unique_id=231501657]
 mesh = SubResource("BoxMesh_4kxuq")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=327290764]
+environment = SubResource("Environment_yokso")
