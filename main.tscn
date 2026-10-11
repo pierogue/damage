@@ -3,16 +3,29 @@
 [ext_resource type="PackedScene" uid="uid://cxayo3ixm3nm8" path="res://enemy.tscn" id="1_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://csvnxwbpljvax" path="res://player.tscn" id="2_h2yge"]
 [ext_resource type="Script" uid="uid://btny1guyvk4v5" path="res://noisy_prop.gd" id="3_h2yge"]
+[ext_resource type="Shader" uid="uid://dlnnqic53qaji" path="res://sky.tres" id="4_lquwl"]
+[ext_resource type="Texture2D" uid="uid://wkgi3543vt1e" path="res://kloofendal_48d_partly_cloudy_puresky_2k.exr" id="5_7mycd"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_4kxuq"]
-vertices = PackedVector3Array(-5.25, 0.5, -5.75, -3.75, 0.5, -5.75, -4, 0.5, -19.5, -19.5, 0.5, -4.75, -5.5, 0.5, -4.75, -19.5, 0.5, -19.5, 4, 0.5, -5.75, 4.25, 0.5, -19.5, 5.5, 0.5, -4.25, 6.25, 0.5, -3, 7.5, 0.5, -2.75, 5.5, 0.5, -5.75, 19.5, 0.5, -0.75, 19.5, 0.5, -19.5, 7.5, 0.5, -0.75, -5.25, 0.5, 8, -3.25, 0.5, 8, -3.25, 0.5, -4, -5.25, 0.5, -4, -5.5, 0.5, 8.75, -19.5, 0.5, 8.75, 5.75, 0.5, -2.75, 5.75, 0.5, 8.25, 5.75, 0.5, 8, 7.5, 0.5, 6, 19.5, 0.5, 6, 7.5, 0.5, 8, 5.5, 0.5, 9.75, 4, 0.5, 9.75, 4.25, 0.5, 19.5, 19.5, 0.5, 19.5, -4, 0.5, 19.5, -3.75, 0.5, 9.75, -5.25, 0.5, 9.75, -19.5, 0.5, 19.5)
-polygons = [PackedInt32Array(2, 1, 0), PackedInt32Array(4, 3, 0), PackedInt32Array(0, 3, 5), PackedInt32Array(0, 5, 2), PackedInt32Array(1, 2, 6), PackedInt32Array(6, 2, 7), PackedInt32Array(9, 8, 10), PackedInt32Array(10, 8, 11), PackedInt32Array(10, 11, 12), PackedInt32Array(12, 11, 7), PackedInt32Array(12, 7, 13), PackedInt32Array(12, 14, 10), PackedInt32Array(11, 6, 7), PackedInt32Array(18, 17, 15), PackedInt32Array(15, 17, 16), PackedInt32Array(15, 19, 18), PackedInt32Array(18, 19, 4), PackedInt32Array(4, 19, 20), PackedInt32Array(4, 20, 3), PackedInt32Array(8, 9, 21), PackedInt32Array(23, 22, 16), PackedInt32Array(8, 21, 17), PackedInt32Array(17, 21, 23), PackedInt32Array(17, 23, 16), PackedInt32Array(14, 12, 24), PackedInt32Array(24, 12, 25), PackedInt32Array(22, 23, 26), PackedInt32Array(27, 22, 26), PackedInt32Array(29, 28, 27), PackedInt32Array(27, 26, 29), PackedInt32Array(29, 26, 30), PackedInt32Array(30, 26, 25), PackedInt32Array(26, 24, 25), PackedInt32Array(33, 32, 31), PackedInt32Array(33, 31, 19), PackedInt32Array(19, 31, 20), PackedInt32Array(20, 31, 34), PackedInt32Array(32, 28, 31), PackedInt32Array(31, 28, 29)]
+vertices = PackedVector3Array(-5.25, 0.5, -5.75, -3.75, 0.5, -5.75, -4, 0.5, -19.5, -19.5, 0.5, -5, -5.5, 0.5, -5, -19.5, 0.5, -19.5, 4, 0.5, -5.75, 4.25, 0.5, -19.5, 5.5, 0.5, -4.25, 6.25, 0.5, -3, 7.5, 0.5, -2.75, 5.5, 0.5, -5.75, 19.5, 0.5, -0.75, 19.5, 0.5, -19.5, 7.5, 0.5, -0.75, -3.25, 0.5, 4, -3.25, 0.5, -4, -5.25, 0.5, -4, -8, 0.5, 4, -8.25, 0.5, 4.75, -19.5, 0.5, 4.75, 5.75, 0.5, -2.75, 2.5, 0.5, 4, 5.75, 0.5, 3.75, 7.5, 0.5, 6, 19.5, 0.5, 6, 3, 0.5, 4.25, 2.75, 0.5, 5.75, 5.75, 0.5, 8, 5.75, 0.5, 8.25, -4, 0.5, 5.75, -3.5, 0.5, 8, -5.5, 0.5, 8.25, -8, 0.5, 5.75, -5.25, 0.5, 9.75, -19.5, 0.5, 19.5, -4, 0.5, 19.5, -3.75, 0.5, 9.75, 7.5, 0.5, 8, 5.5, 0.5, 9.75, 4, 0.5, 9.75, 4.25, 0.5, 19.5, 19.5, 0.5, 19.5)
+polygons = [PackedInt32Array(2, 1, 0), PackedInt32Array(4, 3, 0), PackedInt32Array(0, 3, 5), PackedInt32Array(0, 5, 2), PackedInt32Array(1, 2, 6), PackedInt32Array(6, 2, 7), PackedInt32Array(9, 8, 10), PackedInt32Array(10, 8, 11), PackedInt32Array(10, 11, 12), PackedInt32Array(12, 11, 7), PackedInt32Array(12, 7, 13), PackedInt32Array(12, 14, 10), PackedInt32Array(11, 6, 7), PackedInt32Array(16, 15, 17), PackedInt32Array(17, 15, 18), PackedInt32Array(18, 19, 4), PackedInt32Array(4, 19, 20), PackedInt32Array(4, 20, 3), PackedInt32Array(4, 17, 18), PackedInt32Array(8, 9, 21), PackedInt32Array(21, 23, 8), PackedInt32Array(8, 23, 22), PackedInt32Array(8, 22, 15), PackedInt32Array(8, 15, 16), PackedInt32Array(14, 12, 24), PackedInt32Array(24, 12, 25), PackedInt32Array(26, 22, 23), PackedInt32Array(26, 23, 27), PackedInt32Array(27, 23, 28), PackedInt32Array(28, 29, 27), PackedInt32Array(27, 29, 31), PackedInt32Array(27, 31, 30), PackedInt32Array(31, 32, 30), PackedInt32Array(30, 32, 33), PackedInt32Array(20, 19, 33), PackedInt32Array(32, 34, 33), PackedInt32Array(33, 34, 36), PackedInt32Array(33, 36, 20), PackedInt32Array(20, 36, 35), PackedInt32Array(34, 37, 36), PackedInt32Array(29, 28, 38), PackedInt32Array(39, 29, 38), PackedInt32Array(41, 40, 39), PackedInt32Array(39, 38, 41), PackedInt32Array(41, 38, 42), PackedInt32Array(42, 38, 25), PackedInt32Array(38, 24, 25), PackedInt32Array(37, 40, 36), PackedInt32Array(36, 40, 41)]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_4kxuq"]
 size = Vector3(0.6, 0.6, 0.6)
 
 [sub_resource type="BoxMesh" id="BoxMesh_4kxuq"]
 size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lquwl"]
+shader = ExtResource("4_lquwl")
+shader_parameter/tex = ExtResource("5_7mycd")
+
+[sub_resource type="Sky" id="Sky_h2yge"]
+sky_material = SubResource("ShaderMaterial_lquwl")
+
+[sub_resource type="Environment" id="Environment_yokso"]
+background_mode = 2
+sky = SubResource("Sky_h2yge")
 
 [node name="Main" type="Node3D" unique_id=1943544522]
 
@@ -36,6 +49,11 @@ size = Vector3(40, 1, 40)
 
 [node name="Wall1" type="CSGBox3D" parent="NavigationRegion3D" unique_id=767852348]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -5)
+use_collision = true
+size = Vector3(10, 3, 0.5)
+
+[node name="Wall4" type="CSGBox3D" parent="NavigationRegion3D" unique_id=1944425542]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6320014, 1.5000005, 4.791918)
 use_collision = true
 size = Vector3(10, 3, 0.5)
 
@@ -70,3 +88,6 @@ shape = SubResource("BoxShape3D_4kxuq")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D" unique_id=231501657]
 mesh = SubResource("BoxMesh_4kxuq")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=534802259]
+environment = SubResource("Environment_yokso")
