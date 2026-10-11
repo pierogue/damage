@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://csvnxwbpljvax"]
+
+[ext_resource type="Script" uid="uid://b10saayk1fde3" path="res://player.gd" id="1_4flbx"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4kxuq"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_4kxuq"]
+size = Vector3(0.1, 0.1, 0.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4kxuq"]
+size = Vector3(1.2, 1, 1.4)
+
+[node name="Player" type="CharacterBody3D" unique_id=1758786537]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_4flbx")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=742053247]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_4kxuq")
+
+[node name="AimPoint" type="Marker3D" parent="." unique_id=558755177]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+
+[node name="Head" type="Node3D" parent="." unique_id=1480638520]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head" unique_id=581254537]
+
+[node name="Bat" type="MeshInstance3D" parent="Head/Camera3D" unique_id=830789828]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, -0.3, -0.6)
+mesh = SubResource("BoxMesh_4kxuq")
+
+[node name="HitArea" type="Area3D" parent="Head" unique_id=2000273322]
+collision_layer = 0
+collision_mask = 5
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Head/HitArea" unique_id=1642983678]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.1)
+shape = SubResource("BoxShape3D_4kxuq")

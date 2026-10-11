@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://cxayo3ixm3nm8"]
+
+[ext_resource type="Script" uid="uid://bqvyvmq4qr0g7" path="res://enemy.gd" id="1_7k104"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4kxuq"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_4kxuq"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_4kxuq"]
+size = Vector3(0.2, 0.2, 0.2)
+
+[node name="Enemy" type="CharacterBody3D" unique_id=2089989446]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_7k104")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1405151713]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_4kxuq")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=650998166]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_4kxuq")
+
+[node name="Eye" type="Node3D" parent="." unique_id=866081086]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=2097690645]
+
+[node name="Label3D" type="Label3D" parent="." unique_id=1865289694]
+
+[node name="Nose" type="MeshInstance3D" parent="." unique_id=470261741]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -0.4)
+mesh = SubResource("BoxMesh_4kxuq")
