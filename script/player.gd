@@ -5,7 +5,8 @@ extends CharacterBody3D
 ##
 ## Управление: WASD ходьба, Shift бег, C присед, Space прыжок,
 ## Space + W у стены = карабкаться, ЛКМ атака (у ПП можно зажать),
-## 1-3 или колёсико мыши смена оружия, R перезарядка, Esc освободить мышь.
+## 1-3 или колёсико мыши смена оружия, R перезарядка, Esc освободить мышь,
+## Q / E наклон влево / вправо (выглядывание из-за угла).
 ##
 ## Дерево сцены:
 ## Player (CharacterBody3D, этот скрипт)
@@ -56,6 +57,7 @@ const RANGE := 80.0                                 # дальность пул�
 const WALK_SPEED := 3.5
 const SPRINT_SPEED := 6.5
 const CROUCH_SPEED := 1.8
+const PRONE_SPEED := 0.5
 const ACCEL := 60.0       # разгон на земле (больше = резче, 1000 = мгновенно)
 const DECEL := 80.0       # торможение на земле
 const AIR_ACCEL := 10.0   # управление в воздухе
@@ -63,9 +65,21 @@ const JUMP_VELOCITY := 5.0
 const CLIMB_SPEED := 2.5
 const STAND_HEIGHT := 1.8
 const CROUCH_HEIGHT := 1.1
+const PRONE_HEIGHT := 0.8
+const LEAN_DISTANCE := 0.6   # на сколько метров голова уходит в сторону
+const LEAN_ANGLE := 15.0     # наклон камеры в градусах
+const LEAN_SPEED := 10.0     # скорость наклона (больше = резче)
+const RECOIL_RECOVERY := 10.0  # как быстро прицел возвращается после отдачи
+const RECOIL_DELAY := 0.1      # пауза после выстрела перед возвратом (сек)
+const MAX_RECOIL := 0.21       # максимум накопленной отдачи, радианы (~12 градусов)
+const STAMINA_DRAIN := 20.0
+const STAMINA_REGEN := 15.0
+const STAMINA_REGEN_DELAY := 1.0
+
 
 @export var mouse_sensitivity := 0.002
 @export var max_health := 100.0
+@export var max_stamina := 100.0
 @export var max_climb_time := 4.0
 
 @onready var head: Node3D = $Head
@@ -77,9 +91,14 @@ const CROUCH_HEIGHT := 1.1
 ## Множитель дальности, с которой враги видят игрока (читают враги)
 var visibility_multiplier := 1.0
 var crouching := false
+var proning := false
 var climbing := false
+var lean := 0.0                 # -1 влево ... 1 вправо, плавно меняется
+var recoil_offset := 0.0        # на сколько отдача подняла прицел (радианы)
+var recoil_timer := 0.0
 var mantling := false
 var health: float
+var stamina: float
 
 var current_weapon := "knife"
 var weapon_nodes := {}          # id -> узел модели (только те, что есть в сцене)
@@ -100,6 +119,7 @@ var attack_cooldown := 0.0
 
 var hud_label: Label
 var muzzle_light: OmniLight3D
+var stamina_regen_timer := 0.0
 
 
 func _ready() -> void:
@@ -108,6 +128,7 @@ func _ready() -> void:
 	# своя копия капсулы, чтобы менять высоту при приседе
 	collision.shape = collision.shape.duplicate()
 	health = max_health
+	stamina = max_stamina
 	climb_time_left = max_climb_time
 
 	# находим модели оружия и запоминаем их исходное положение
@@ -138,6 +159,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and captured:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		head.rotate_x(-event.relative.y * mouse_sensitivity)
+		# если игрок сам опускает прицел, это гасит отдачу, и возврат не перелетит
+		var pitch_change: float = -event.relative.y * mouse_sensitivity
+		if pitch_change < 0.0 and recoil_offset > 0.0:
+			recoil_offset = maxf(recoil_offset + pitch_change, 0.0)
 		head.rotation.x = clampf(head.rotation.x, deg_to_rad(-85.0), deg_to_rad(85.0))
 	elif event.is_action_pressed("ui_cancel"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -162,11 +187,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	attack_cooldown = maxf(attack_cooldown - delta, 0.0)
+	_update_recoil(delta)
 	if mantling:
 		return  # во время вылезания на уступ двигает твин
 
 	_handle_attack()
 	_update_crouch(delta)
+	_update_prone(delta)
+	_update_lean(delta)
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 
 	if is_on_floor():
@@ -185,13 +213,27 @@ func _physics_process(delta: float) -> void:
 	# ---- обычное движение
 	var dir := (transform.basis * Vector3(input.x, 0.0, input.y)).normalized()
 	var moving := input != Vector2.ZERO
-	var sprinting := moving and not crouching and Input.is_action_pressed("sprint")
+	var wants_sprint := moving and not crouching and not proning and Input.is_action_pressed("sprint")
+	var sprinting := wants_sprint and stamina > 0.0
 
 	var speed := WALK_SPEED
 	if crouching:
 		speed = CROUCH_SPEED
 	elif sprinting:
 		speed = SPRINT_SPEED
+	if proning:
+		speed = PRONE_SPEED
+	elif sprinting:
+		speed = SPRINT_SPEED
+	# расход и восстановление стамины
+	if sprinting and moving:
+		stamina = maxf(stamina - STAMINA_DRAIN * delta, 0.0)
+		stamina_regen_timer = STAMINA_REGEN_DELAY
+	else:
+		stamina_regen_timer = maxf(stamina_regen_timer - delta, 0.0)
+		if stamina_regen_timer <= 0.0:
+			stamina = minf(stamina + STAMINA_REGEN * delta, max_stamina)
+	_update_hud()
 
 	var accel := AIR_ACCEL
 	if is_on_floor():
@@ -201,7 +243,7 @@ func _physics_process(delta: float) -> void:
 
 	if not is_on_floor():
 		velocity.y -= gravity * delta
-	elif Input.is_action_just_pressed("jump") and not crouching:
+	elif Input.is_action_just_pressed("jump") and not crouching and not proning:
 		velocity.y = JUMP_VELOCITY
 		NoiseBus.emit(global_position, 4.0)
 
@@ -216,7 +258,12 @@ func _physics_process(delta: float) -> void:
 	camera.fov = lerpf(camera.fov, 82.0 if sprinting else 75.0, 8.0 * delta)
 
 	# заметность: присел = виден хуже, стоишь на месте = ещё чуть хуже
-	visibility_multiplier = 0.5 if crouching else 1.0
+	if proning:
+		visibility_multiplier = 0.1
+	elif crouching:
+		visibility_multiplier = 0.5
+	else:
+		visibility_multiplier = 1.0
 	if not moving:
 		visibility_multiplier *= 0.8
 
@@ -226,18 +273,58 @@ func _physics_process(delta: float) -> void:
 func get_aim_point() -> Vector3:
 	return aim_point.global_position
 
-
+# ---------------------------------------------------------------- лежачка
+func _update_prone(delta: float) -> void:
+	if Input.is_action_just_pressed("prone"):
+		proning = not proning
+		if proning:
+			crouching = false   # лёжа не сидим
+	var target_height := PRONE_HEIGHT if proning else STAND_HEIGHT
+	var shape := collision.shape as CapsuleShape3D
+	shape.height = lerpf(shape.height, target_height, 10.0 * delta)
+	collision.position.y = shape.height / 2.0
+	# лёжа голова опускается ещё ниже формы капсулы
+	var head_y: float = 0.25 if proning else shape.height - 0.2
+	head.position.y = lerpf(head.position.y, head_y, 10.0 * delta)
+	aim_point.position.y = lerpf(aim_point.position.y, head_y - 0.2, 10.0 * delta)
 # ---------------------------------------------------------------- присед
 
 func _update_crouch(delta: float) -> void:
-	crouching = Input.is_action_pressed("crouch")
+	if Input.is_action_just_pressed("crouch"):
+		crouching = not crouching
 	# TODO: проверять потолок над головой перед вставанием
+	if crouching:
+		proning = false
 	var target_height := CROUCH_HEIGHT if crouching else STAND_HEIGHT
 	var shape := collision.shape as CapsuleShape3D
 	shape.height = lerpf(shape.height, target_height, 10.0 * delta)
 	collision.position.y = shape.height / 2.0
 	head.position.y = shape.height - 0.2
 	aim_point.position.y = shape.height - 0.4
+
+
+# ---------------------------------------------------------------- наклоны (lean)
+
+## Q / E: голова смещается в сторону и камера кренится.
+## Если сбоку стена, наклон ограничивается, чтобы камера не пролезла внутрь.
+func _update_lean(delta: float) -> void:
+	var target := 0.0
+	if not climbing:
+		target = Input.get_axis("lean_left", "lean_right")
+
+	if target != 0.0:
+		var origin := global_position + Vector3.UP * head.position.y
+		var side := global_transform.basis.x * signf(target)
+		var wall := _ray(origin, origin + side * (LEAN_DISTANCE + 0.3))
+		if not wall.is_empty():
+			var free := maxf(origin.distance_to(wall.position) - 0.3, 0.0)
+			target *= clampf(free / LEAN_DISTANCE, 0.0, 1.0)
+
+	lean = lerpf(lean, target, LEAN_SPEED * delta)
+	head.position.x = lean * LEAN_DISTANCE
+	head.rotation.z = -lean * deg_to_rad(LEAN_ANGLE)
+	# враги целятся в AimPoint, поэтому он тоже выглядывает вместе с головой
+	aim_point.position.x = lean * LEAN_DISTANCE
 
 
 # ---------------------------------------------------------------- карабканье
@@ -318,6 +405,9 @@ func _footsteps(delta: float, moving: bool, sprinting: bool) -> void:
 	if sprinting:
 		step_timer = 0.3
 		NoiseBus.emit(global_position, 10.0)
+	if proning:
+		step_timer = 1
+		NoiseBus.emit(global_position, 1.0)
 	elif crouching:
 		step_timer = 0.7
 		NoiseBus.emit(global_position, 1.5)
@@ -442,9 +532,11 @@ func _fire(data: Dictionary) -> void:
 	attack_cooldown = data["cooldown"]
 	_play_recoil(data)
 	_flash()
-	head.rotation.x = clampf(
-		head.rotation.x + deg_to_rad(float(data["kick"])),
-		deg_to_rad(-85.0), deg_to_rad(85.0))
+	var kick := minf(deg_to_rad(float(data["kick"])), MAX_RECOIL - recoil_offset)
+	if kick > 0.0:
+		head.rotation.x = minf(head.rotation.x + kick, deg_to_rad(85.0))
+		recoil_offset += kick
+	recoil_timer = RECOIL_DELAY
 
 	# пуля летит из центра камеры, с разбросом (в приседе он вдвое меньше)
 	var cam_basis := camera.global_transform.basis
@@ -501,6 +593,17 @@ func _reload() -> void:
 	ammo_reserve[id] -= take
 	reloading = false
 	_update_hud()
+
+
+## Прицел плавно возвращается туда, где был до стрельбы.
+func _update_recoil(delta: float) -> void:
+	recoil_timer -= delta
+	if recoil_offset <= 0.0 or recoil_timer > 0.0:
+		return
+	var step := maxf(recoil_offset * RECOIL_RECOVERY * delta, deg_to_rad(4.0) * delta)
+	step = minf(step, recoil_offset)
+	head.rotation.x -= step
+	recoil_offset -= step
 
 
 func _play_recoil(data: Dictionary) -> void:
@@ -636,7 +739,10 @@ func _setup_input() -> void:
 		"move_right": KEY_D,
 		"sprint": KEY_SHIFT,
 		"crouch": KEY_C,
+		"prone": KEY_Z,
 		"jump": KEY_SPACE,
+		"lean_left": KEY_Q,
+		"lean_right": KEY_E,
 		"reload": KEY_R,
 		"weapon_1": KEY_1,
 		"weapon_2": KEY_2,

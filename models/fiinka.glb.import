@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dt38qj2agnv3l"
-path="res://.godot/imported/oryzhie.glb-90e926b06b693210f94d8cef59a9751f.scn"
+uid="uid://b6yi82afqquk5"
+path="res://.godot/imported/fiinka.glb-edc055ceaa697de2db3f92d099e66528.scn"
 
 [deps]
 
-source_file="res://oryzhie.glb"
-dest_files=["res://.godot/imported/oryzhie.glb-90e926b06b693210f94d8cef59a9751f.scn"]
+source_file="res://models/fiinka.glb"
+dest_files=["res://.godot/imported/fiinka.glb-edc055ceaa697de2db3f92d099e66528.scn"]
 
 [params]
 
