@@ -33,10 +33,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0.4, -0.3, -0.6)
 
 [node name="SMG" parent="Head/Camera3D" unique_id=431689921 instance=ExtResource("3_hqtel")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.387071, 0, -0.799567)
 
 [node name="Knife" parent="Head/Camera3D" unique_id=1830664080 instance=ExtResource("4_sweqy")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+transform = Transform3D(1.9106855e-15, 4.371139e-08, -1, 1, -4.371139e-08, 0, -4.371139e-08, -1, -4.371139e-08, 0.4195119, 0, -0.5662978)
 
 [node name="HitArea" type="Area3D" parent="Head" unique_id=2000273322]
 collision_layer = 0
