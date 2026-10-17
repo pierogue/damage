@@ -168,3 +168,7 @@ mesh = SubResource("BoxMesh_4kxuq")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=327290764]
 environment = SubResource("Environment_yokso")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1602677240]
+
+[node name="HealthBar" parent="CanvasLayer" unique_id=2002860866 instance=ExtResource("8_5vw27")]
