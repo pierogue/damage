@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://ktgkx6xl2j0b" path="res://Untitled.glb" id="2_onrkg"]
 [ext_resource type="PackedScene" uid="uid://dt38qj2agnv3l" path="res://oryzhie.glb" id="3_hqtel"]
 [ext_resource type="PackedScene" uid="uid://b6yi82afqquk5" path="res://fiinka.glb" id="4_sweqy"]
+[ext_resource type="Script" uid="uid://cugoddtm6v4u0" path="res://HealthComponent.cs" id="5_sweqy"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4kxuq"]
 radius = 0.4
@@ -12,7 +13,7 @@ height = 1.8
 [sub_resource type="BoxShape3D" id="BoxShape3D_4kxuq"]
 size = Vector3(1.2, 1, 1.4)
 
-[node name="Player" type="CharacterBody3D" unique_id=1758786537]
+[node name="Player" type="CharacterBody3D" unique_id=1758786537 groups=["player"]]
 collision_layer = 2
 collision_mask = 5
 script = ExtResource("1_4flbx")
@@ -45,3 +46,6 @@ collision_mask = 5
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Head/HitArea" unique_id=1642983678]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.1)
 shape = SubResource("BoxShape3D_4kxuq")
+
+[node name="HealthComponent" type="Node" parent="." unique_id=708801597]
+script = ExtResource("5_sweqy")

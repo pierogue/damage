@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://d2kqjkhs04jul"]
+
+[ext_resource type="Script" uid="uid://1ifo7sob2v5x" path="res://HealthBar.cs" id="1_ypcvb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j0uls"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yokso"]
+bg_color = Color(0.6, 1, 0.6, 1)
+
+[node name="HealthBar" type="Control" unique_id=2002860866]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_ypcvb")
+
+[node name="ProgressBar" type="ProgressBar" parent="." unique_id=1468252860]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -297.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = 23.0
+grow_horizontal = 0
+pivot_offset_ratio = Vector2(1, 0)
+theme_override_styles/background = SubResource("StyleBoxFlat_j0uls")
+theme_override_styles/fill = SubResource("StyleBoxFlat_yokso")
+fill_mode = 1
+show_percentage = false
