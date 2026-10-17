@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://ktgkx6xl2j0b" path="res://models/Untitled.glb" id="2_onrkg"]
 [ext_resource type="PackedScene" uid="uid://dt38qj2agnv3l" path="res://models/oryzhie.glb" id="3_hqtel"]
 [ext_resource type="PackedScene" uid="uid://b6yi82afqquk5" path="res://models/fiinka.glb" id="4_sweqy"]
+[ext_resource type="Script" uid="uid://dgv5u6808nhb3" path="res://HealthComponent.cs" id="5_sweqy"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4kxuq"]
 radius = 0.4

@@ -5,8 +5,9 @@
 [ext_resource type="Texture2D" uid="uid://bvna8b13ujdvc" path="res://textures/OIP (1).webp" id="3_7mycd"]
 [ext_resource type="Script" uid="uid://btny1guyvk4v5" path="res://script/noisy_prop.gd" id="3_h2yge"]
 [ext_resource type="Texture2D" uid="uid://c0xhgig0o44us" path="res://textures/stone.jpg" id="4_272bh"]
-[ext_resource type="Shader" uid="uid://dlnnqic53qaji" path="res://skyboxes/sky.tres" id="4_lquwl"]
-[ext_resource type="Texture2D" uid="uid://wkgi3543vt1e" path="res://skyboxes/kloofendal_48d_partly_cloudy_puresky_2k.exr" id="5_7mycd"]
+[ext_resource type="Shader" uid="uid://dlnnqic53qaji" path="res://skyboxes/sky.tres" id="6_5vw27"]
+[ext_resource type="Texture2D" path="res://skyboxes/kloofendal_48d_partly_cloudy_puresky_2k.exr" id="7_5vw27"]
+[ext_resource type="PackedScene" uid="uid://d2kqjkhs04jul" path="res://HealthBar.tscn" id="8_5vw27"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_4kxuq"]
 vertices = PackedVector3Array(-5.25, 0.5, -5.75, -3.75, 0.5, -5.75, -4, 0.5, -19.5, -19.5, 0.5, -4.75, -5.5, 0.5, -4.75, -19.5, 0.5, -19.5, 4, 0.5, -5.75, 4.25, 0.5, -19.5, 5.5, 0.5, -4.25, 6.25, 0.5, -3, 7.5, 0.5, -2.75, 5.5, 0.5, -5.75, 19.5, 0.5, -0.75, 19.5, 0.5, -19.5, 7.5, 0.5, -0.75, -5.25, 0.5, 8, -3.25, 0.5, 8, -3.25, 0.5, -4, -5.25, 0.5, -4, -5.5, 0.5, 8.75, -19.5, 0.5, 8.75, 5.75, 0.5, -2.75, 5.75, 0.5, 8.25, 5.75, 0.5, 8, 7.5, 0.5, 6, 19.5, 0.5, 6, 7.5, 0.5, 8, 5.5, 0.5, 9.75, 4, 0.5, 9.75, 4.25, 0.5, 19.5, 19.5, 0.5, 19.5, -4, 0.5, 19.5, -3.75, 0.5, 9.75, -5.25, 0.5, 9.75, -19.5, 0.5, 19.5)
@@ -44,8 +45,8 @@ size = Vector3(0.6, 0.6, 0.6)
 size = Vector3(0.6, 0.6, 0.6)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lquwl"]
-shader = ExtResource("4_lquwl")
-shader_parameter/Texture2DParameter = ExtResource("5_7mycd")
+shader = ExtResource("6_5vw27")
+shader_parameter/Texture2DParameter = ExtResource("7_5vw27")
 
 [sub_resource type="Sky" id="Sky_h2yge"]
 sky_material = SubResource("ShaderMaterial_lquwl")
