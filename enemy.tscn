@@ -36,3 +36,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 [node name="Nose" type="MeshInstance3D" parent="." unique_id=470261741]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, -0.4)
 mesh = SubResource("BoxMesh_4kxuq")
+
+[node name="ShooterBehavior" type="Node3D" parent="." unique_id=1289492608]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1564167, 0)
+script = ExtResource("2_qi2p4")
+BulletScene = ExtResource("3_iifgy")
+isActive = true
+metadata/_custom_type_script = "uid://06kdl6n73nln"
