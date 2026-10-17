@@ -239,8 +239,14 @@ func _face(dir: Vector3, delta: float) -> void:
 
 # ---------------------------------------------------------------- удар битой
 
-## Вызывается игроком. Возвращает громкость шума от удара.
+## Совместимость со старым кодом: удар битой.
 func receive_bat_hit(attacker: Player) -> float:
+	return receive_melee_hit(attacker, bat_damage, 12.0, 3.0)
+
+
+## Вызывается игроком при ударе холодным оружием (бита, финка).
+## Возвращает громкость шума: hit_noise за обычный удар, kill_noise за убийство.
+func receive_melee_hit(attacker: Player, damage: float, hit_noise: float, kill_noise: float) -> float:
 	if state == State.DEAD:
 		return 0.0
 
@@ -252,18 +258,32 @@ func receive_bat_hit(attacker: Player) -> float:
 	# убийство со спины: тихо и сразу, если враг не в погоне
 	if from_behind and state != State.CHASE:
 		_die()
-		return 3.0
+		return kill_noise
 
-	health -= bat_damage
+	health -= damage
 	if health <= 0.0:
 		_die()
-		return 12.0
+		return hit_noise
 
 	# выжил: сразу знает, где игрок
 	last_known_position = attacker.global_position
 	awareness = 1.0
 	_set_state(State.CHASE)
-	return 12.0
+	return hit_noise
+
+
+## Вызывается игроком при попадании из пистолета.
+func receive_shot(attacker: Player, damage: float) -> void:
+	if state == State.DEAD:
+		return
+	health -= damage
+	if health <= 0.0:
+		_die()
+		return
+	# выжил: сразу знает, где игрок
+	last_known_position = attacker.global_position
+	awareness = 1.0
+	_set_state(State.CHASE)
 
 
 func _die() -> void:
