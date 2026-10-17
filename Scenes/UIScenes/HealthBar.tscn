@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d2kqjkhs04jul"]
 
-[ext_resource type="Script" uid="uid://1ifo7sob2v5x" path="res://HealthBar.cs" id="1_ypcvb"]
+[ext_resource type="Script" uid="uid://1ifo7sob2v5x" path="res://Scenes/UIScenes/HealthBar.cs" id="1_4cygy"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j0uls"]
 
@@ -15,7 +15,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-script = ExtResource("1_ypcvb")
+script = ExtResource("1_4cygy")
 
 [node name="ProgressBar" type="ProgressBar" parent="." unique_id=1468252860]
 layout_mode = 1

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dwe8pvxbwouu5"]
 
-[ext_resource type="Script" uid="uid://c4js34gtaceg7" path="res://Bullet.cs" id="1_v7oki"]
+[ext_resource type="Script" uid="uid://c4js34gtaceg7" path="res://Scenes/EntityScenes/Bullet.cs" id="1_bc6nf"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_yokso"]
 size = Vector3(0.07566762, 0.075149536, 0.084732056)
@@ -19,7 +19,7 @@ size = Vector3(0.02, 0.02, 0.649)
 [node name="Bullet" type="Area3D" unique_id=146914556]
 collision_layer = 8
 collision_mask = 3
-script = ExtResource("1_v7oki")
+script = ExtResource("1_bc6nf")
 
 [node name="BulletCollision" type="CollisionShape3D" parent="." unique_id=1663618622]
 shape = SubResource("BoxShape3D_yokso")

@@ -1,14 +1,14 @@
 using Godot;
 using System;
 
+[GlobalClass]
 public partial class HealthComponent : Node
 {
 
 	[Export] public int MaxHealth { get; set; } = 100;
 	[Export] public int CurrentHealth { get; set; } = 100;
 	[Export] public bool IsInvincible { get; set; } = false;
-	[Export] public bool ShowInterface { get; set; } = false;
-
+	
 	[Signal] public delegate void HealthChangedEventHandler(int currentHealth, int maxHealth);
 	[Signal] public delegate void DiedEventHandler();
 
