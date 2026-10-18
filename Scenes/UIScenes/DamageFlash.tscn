@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://clfacidkx6ced"]
+
+[ext_resource type="Script" uid="uid://1m3oynr32dx2" path="res://Scenes/UIScenes/DamageFlash.cs" id="1_ro5pb"]
+
+[node name="DamageFlash" type="Control" unique_id=128857066]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ro5pb")
+
+[node name="Overlay" type="ColorRect" parent="." unique_id=999769550]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0, 0, 1)
