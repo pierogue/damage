@@ -7,6 +7,8 @@
 [ext_resource type="Script" uid="uid://cugoddtm6v4u0" path="res://Components/HealthComponent.cs" id="5_x7kdv"]
 [ext_resource type="Script" uid="uid://dufns4s4x1jm" path="res://Components/PatrolBehavior.cs" id="6_3guxe"]
 [ext_resource type="Script" uid="uid://7ctv5jtcv5dh" path="res://Components/NavMover.cs" id="7_ujmw2"]
+[ext_resource type="Script" uid="uid://dg4n5n0m4irb0" path="res://Components/ChaseBehavior.cs" id="8_b46si"]
+[ext_resource type="Script" uid="uid://38j6luqgwchn" path="res://Components/MeleeAttackBehavior.cs" id="9_l7l7y"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4kxuq"]
 radius = 0.4
@@ -46,6 +48,7 @@ mesh = SubResource("BoxMesh_4kxuq")
 [node name="ShooterBehavior" type="Node3D" parent="." unique_id=1289492608]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1564167, 0)
 script = ExtResource("2_qi2p4")
+ShootingEnabled = false
 BulletScene = ExtResource("3_iifgy")
 isActive = true
 metadata/_custom_type_script = "uid://06kdl6n73nln"
@@ -70,3 +73,12 @@ metadata/_custom_type_script = "uid://dufns4s4x1jm"
 [node name="NavMover" type="Node" parent="." unique_id=1703283389]
 script = ExtResource("7_ujmw2")
 metadata/_custom_type_script = "uid://7ctv5jtcv5dh"
+
+[node name="ChaseBehavior" type="Node" parent="." unique_id=660673309]
+script = ExtResource("8_b46si")
+AttackRange = 2.0
+metadata/_custom_type_script = "uid://dg4n5n0m4irb0"
+
+[node name="MeleeAttackBehavior" type="Node" parent="." unique_id=953657170]
+script = ExtResource("9_l7l7y")
+metadata/_custom_type_script = "uid://38j6luqgwchn"
