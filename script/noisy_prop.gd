@@ -23,4 +23,4 @@ func _on_body_entered(_body: Node) -> void:
 	if cooldown > 0.0 or prev_speed < min_speed:
 		return
 	cooldown = 0.3
-	NoiseBus.emit(global_position, clampf(prev_speed * 2.5, 3.0, 14.0))
+	NoiseBus.EmitNoise(global_position, clampf(prev_speed * 2.5, 3.0, 14.0))

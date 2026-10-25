@@ -17,7 +17,7 @@ config/icon="res://textures/icon.svg"
 
 [autoload]
 
-NoiseBus="*uid://d0et2rlmd2ecb"
+NoiseBus="*uid://d3j6d2dnjs70v"
 
 [display]
 

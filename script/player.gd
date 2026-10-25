@@ -245,14 +245,14 @@ func _physics_process(delta: float) -> void:
 		velocity.y -= gravity * delta
 	elif Input.is_action_just_pressed("jump") and not crouching and not proning:
 		velocity.y = JUMP_VELOCITY
-		NoiseBus.emit(global_position, 4.0)
+		NoiseBus.EmitNoise(global_position, 4.0)
 
 	var fall_speed := -velocity.y
 	move_and_slide()
 
 	# приземление шумит тем сильнее, чем выше упал
 	if is_on_floor() and not was_on_floor and fall_speed > 4.0:
-		NoiseBus.emit(global_position, clampf(fall_speed * 1.5, 4.0, 14.0))
+		NoiseBus.EmitNoise(global_position, clampf(fall_speed * 1.5, 4.0, 14.0))
 	was_on_floor = is_on_floor()
 
 	camera.fov = lerpf(camera.fov, 82.0 if sprinting else 75.0, 8.0 * delta)
@@ -376,7 +376,7 @@ func _mantle(target: Vector3) -> void:
 	mantling = true
 	climbing = false
 	velocity = Vector3.ZERO
-	NoiseBus.emit(global_position, 4.0)
+	NoiseBus.EmitNoise(global_position, 4.0)
 	var t := create_tween()
 	t.tween_property(self, "global_position:y", target.y, 0.25).set_trans(Tween.TRANS_SINE)
 	t.tween_property(self, "global_position", target, 0.2).set_trans(Tween.TRANS_SINE)
@@ -390,7 +390,7 @@ func _climb_noise(delta: float) -> void:
 	climb_noise_timer -= delta
 	if climb_noise_timer <= 0.0:
 		climb_noise_timer = 0.6
-		NoiseBus.emit(global_position, 4.0)
+		NoiseBus.EmitNoise(global_position, 4.0)
 
 
 # ---------------------------------------------------------------- шум шагов
@@ -404,16 +404,16 @@ func _footsteps(delta: float, moving: bool, sprinting: bool) -> void:
 		return
 	if sprinting:
 		step_timer = 0.3
-		NoiseBus.emit(global_position, 10.0)
+		NoiseBus.EmitNoise(global_position, 10.0)
 	if proning:
 		step_timer = 1
-		NoiseBus.emit(global_position, 1.0)
+		NoiseBus.EmitNoise(global_position, 1.0)
 	elif crouching:
 		step_timer = 0.7
-		NoiseBus.emit(global_position, 1.5)
+		NoiseBus.EmitNoise(global_position, 1.5)
 	else:
 		step_timer = 0.5
-		NoiseBus.emit(global_position, 5.0)
+		NoiseBus.EmitNoise(global_position, 5.0)
 
 
 # ---------------------------------------------------------------- смена оружия
@@ -495,7 +495,7 @@ func _melee_attack(data: Dictionary) -> void:
 			l = hit_noise
 		loudness = maxf(loudness, l)
 
-	NoiseBus.emit(hit_area.global_position, loudness)
+	NoiseBus.EmitNoise(hit_area.global_position, loudness)
 
 
 func _play_melee_anim(data: Dictionary) -> void:
@@ -523,7 +523,7 @@ func _fire(data: Dictionary) -> void:
 	var id := current_weapon
 	if ammo_mag[id] <= 0:
 		attack_cooldown = 0.3
-		NoiseBus.emit(global_position, 3.0)  # сухой щелчок
+		NoiseBus.EmitNoise(global_position, 3.0)  # сухой щелчок
 		if ammo_reserve[id] > 0:
 			_reload()
 		return
@@ -565,7 +565,7 @@ func _fire(data: Dictionary) -> void:
 			_spawn_bullet_mark(hit.position, hit.normal)
 
 	# выстрел очень громкий: его слышат враги далеко вокруг
-	NoiseBus.emit(global_position, data["noise"])
+	NoiseBus.EmitNoise(global_position, data["noise"])
 	_update_hud()
 
 
@@ -580,7 +580,7 @@ func _reload() -> void:
 	reloading = true
 	reload_id += 1
 	var my_id := reload_id
-	NoiseBus.emit(global_position, 3.0)
+	NoiseBus.EmitNoise(global_position, 3.0)
 	_play_reload_anim(data)
 	_update_hud()
 
